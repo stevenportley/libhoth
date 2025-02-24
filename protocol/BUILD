@@ -231,7 +231,6 @@ cc_library(
     ],
 )
 
-
 cc_test(
     name = "spi_proxy_test",
     srcs = ["spi_proxy_test.cc"],
@@ -243,3 +242,26 @@ cc_test(
         ":spi_proxy",
     ],
 )
+
+cc_library(
+    name = "target_control",
+    hdrs = ["target_control.h"],
+    srcs = ["target_control.c"],
+    deps = [
+        "//transports:libhoth_device",
+        ":host_cmd",
+    ],
+)
+
+cc_test(
+    name = "target_control_test",
+    srcs = ["target_control_test.cc"],
+    deps = [
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+        "//transports:libhoth_device",
+        "//protocol/test:libhoth_device_mock",
+        ":target_control",
+    ],
+)
+

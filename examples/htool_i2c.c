@@ -23,8 +23,8 @@
 #include "host_commands.h"
 #include "htool.h"
 #include "htool_cmd.h"
-#include "htool_target_control.h"
 #include "protocol/i2c.h"
+#include "protocol/target_control.h"
 
 static int i2c_detect(struct libhoth_device *dev,
                       const struct htool_invocation *inv) {
@@ -231,9 +231,14 @@ static const char *i2c_muxctrl_status_str_map(
 }
 
 int htool_i2c_muxctrl_get(const struct htool_invocation *inv) {
+  struct libhoth_device *dev = htool_libhoth_device();
+  if (!dev) {
+    return -1;
+  }
+
   struct ec_response_target_control response;
-  int ret = target_control_perform_action(EC_TARGET_CONTROL_I2C_MUX,
-                                          I2C_MUXCTRL_ACTION_GET, &response);
+  int ret = libhoth_target_control_perform_action(
+      dev, EC_TARGET_CONTROL_I2C_MUX, I2C_MUXCTRL_ACTION_GET, &response);
   if (ret != 0) {
     return ret;
   }
@@ -245,16 +250,21 @@ int htool_i2c_muxctrl_get(const struct htool_invocation *inv) {
 
 static int i2c_mux_control_change_select(
     const enum ec_target_control_action action) {
+  struct libhoth_device *dev = htool_libhoth_device();
+  if (!dev) {
+    return -1;
+  }
+
   struct ec_response_target_control response;
-  int ret = target_control_perform_action(EC_TARGET_CONTROL_I2C_MUX, action,
-                                          &response);
+  int ret = libhoth_target_control_perform_action(
+      dev, EC_TARGET_CONTROL_I2C_MUX, action, &response);
   if (ret != 0) {
     return ret;
   }
   const enum ec_target_control_status old_status = response.status;
 
-  ret = target_control_perform_action(EC_TARGET_CONTROL_I2C_MUX,
-                                      I2C_MUXCTRL_ACTION_GET, &response);
+  ret = libhoth_target_control_perform_action(
+      dev, EC_TARGET_CONTROL_I2C_MUX, I2C_MUXCTRL_ACTION_GET, &response);
   if (ret != 0) {
     return ret;
   }

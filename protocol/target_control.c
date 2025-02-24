@@ -1,4 +1,4 @@
-// Copyright 2024 Google LLC
+// Copyright 2025 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,24 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "htool_target_control.h"
+#include "target_control.h"
 
 #include <stdint.h>
 #include <stdio.h>
 
-#include "host_commands.h"
-#include "htool.h"
+#include "host_cmd.h"
 
-int target_control_perform_action(
-    const enum ec_target_control_function function,
+int libhoth_target_control_perform_action(
+    struct libhoth_device* dev, const enum ec_target_control_function function,
     const enum ec_target_control_action action,
     struct ec_response_target_control* const response) {
   if (response == NULL) {
-    return -1;
-  }
-
-  struct libhoth_device* dev = htool_libhoth_device();
-  if (!dev) {
     return -1;
   }
 

@@ -31,7 +31,6 @@ executable(
     'htool_raw_host_command.c',
     'htool_spi.c',
     'htool_statistics.c',
-    'htool_target_control.c',
     'htool_target_usb.c',
     'htool_usb.c',
     'htool_srtm.h',

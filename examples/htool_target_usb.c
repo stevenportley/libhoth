@@ -17,9 +17,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "host_commands.h"
-#include "htool_cmd.h"
-#include "htool_target_control.h"
+#include "htool.h"
+#include "protocol/target_control.h"
 
 // USB mux control actions to Target control actions mapping
 enum {
@@ -42,9 +41,14 @@ static const char* target_usb_muxctrl_status_str_map(
 }
 
 int htool_target_usb_muxctrl_get(const struct htool_invocation* inv) {
+  struct libhoth_device* dev = htool_libhoth_device();
+  if (!dev) {
+    return -1;
+  }
+
   struct ec_response_target_control response;
-  int ret = target_control_perform_action(EC_TARGET_CONTROL_GENERIC_MUX,
-                                          TARGET_USB_ACTION_GET, &response);
+  int ret = libhoth_target_control_perform_action(
+      dev, EC_TARGET_CONTROL_GENERIC_MUX, TARGET_USB_ACTION_GET, &response);
   if (ret != 0) {
     return ret;
   }
@@ -56,17 +60,22 @@ int htool_target_usb_muxctrl_get(const struct htool_invocation* inv) {
 
 int target_usb_mux_control_change_select(
     const enum ec_target_control_action action) {
+  struct libhoth_device* dev = htool_libhoth_device();
+  if (!dev) {
+    return -1;
+  }
+
   struct ec_response_target_control response;
 
-  int ret = target_control_perform_action(EC_TARGET_CONTROL_GENERIC_MUX, action,
-                                          &response);
+  int ret = libhoth_target_control_perform_action(
+      dev, EC_TARGET_CONTROL_GENERIC_MUX, action, &response);
   if (ret != 0) {
     return ret;
   }
   const enum ec_target_control_status old_status = response.status;
 
-  ret = target_control_perform_action(EC_TARGET_CONTROL_GENERIC_MUX,
-                                      TARGET_USB_ACTION_GET, &response);
+  ret = libhoth_target_control_perform_action(
+      dev, EC_TARGET_CONTROL_GENERIC_MUX, TARGET_USB_ACTION_GET, &response);
   if (ret != 0) {
     return ret;
   }

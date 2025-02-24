@@ -37,18 +37,18 @@
 #include "htool_panic.h"
 #include "htool_payload.h"
 #include "htool_payload_update.h"
-#include "protocol/progress.h"
 #include "htool_raw_host_command.h"
 #include "htool_srtm.h"
 #include "htool_statistics.h"
-#include "htool_target_control.h"
 #include "htool_target_usb.h"
 #include "htool_usb.h"
 #include "protocol/authz_record.h"
 #include "protocol/chipinfo.h"
+#include "protocol/progress.h"
 #include "protocol/reboot.h"
 #include "protocol/rot_firmware_version.h"
 #include "protocol/spi_proxy.h"
+#include "protocol/target_control.h"
 #include "transports/libhoth_device.h"
 
 static int command_usb_list(const struct htool_invocation* inv) {
@@ -392,7 +392,7 @@ static int command_spi_update(const struct htool_invocation* inv) {
   struct libhoth_progress_stderr progress;
   libhoth_progress_stderr_init(&progress, "Erasing/Programming");
   status = libhoth_spi_proxy_update(&spi, args.start, file_data, file_size,
-                                  &progress.progress);
+                                    &progress.progress);
   if (status) {
     goto cleanup2;
   }
@@ -401,7 +401,7 @@ static int command_spi_update(const struct htool_invocation* inv) {
     struct libhoth_progress_stderr progress;
     libhoth_progress_stderr_init(&progress, "Verifying");
     status = libhoth_spi_proxy_verify(&spi, args.start, file_data, file_size,
-                                    &progress.progress);
+                                      &progress.progress);
     if (status) {
       goto cleanup2;
     }
@@ -603,8 +603,8 @@ int htool_external_usb_host_check_presence(const struct htool_invocation* inv) {
   }
 
   struct ec_response_target_control response = {0};
-  const int action_status = target_control_perform_action(
-      EC_TARGET_DETECT_EXTERNAL_USB_HOST_PRESENCE,
+  const int action_status = libhoth_target_control_perform_action(
+      dev, EC_TARGET_DETECT_EXTERNAL_USB_HOST_PRESENCE,
       EC_TARGET_CONTROL_ACTION_GET_STATUS, &response);
   if (action_status != 0) {
     return action_status;
