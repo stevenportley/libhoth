@@ -30,6 +30,8 @@ struct libhoth_mtd_device_init_options {
   const char* name;
   // Address where mailbox is located
   unsigned int mailbox;
+  // Open the device with O_RDONLY
+  bool read_only;
 };
 
 // Note that the options struct only needs to to live for the duration of

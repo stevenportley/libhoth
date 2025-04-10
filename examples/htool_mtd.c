@@ -52,6 +52,7 @@ struct libhoth_device* htool_libhoth_mtd_device(void) {
       .path = mtddev_path_str,
       .name = mtddev_name_str,
       .mailbox = mailbox_location,
+      .read_only = false,
   };
   rv = libhoth_mtd_open(&opts, &result);
   if (rv) {

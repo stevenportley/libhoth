@@ -108,9 +108,12 @@ static int libhoth_mtd_release(struct libhoth_device* dev) {
   return LIBHOTH_OK;
 }
 
-static int mtd_open(const char* path, const char* name) {
+static int mtd_open(const char* path, const char* name, bool read_only) {
+
+  int flags = read_only ? O_RDONLY : O_RDWR;
+
   if (strlen(path) > 0) {
-    return open(path, O_RDWR);
+    return open(path, flags);
   }
 
   FILE* fp;
@@ -146,7 +149,7 @@ static int mtd_open(const char* path, const char* name) {
     }
     if (strcmp(mtd_name, name) == 0) {
       sprintf(resolved_path, "/dev/mtd%d", mtd_id);
-      return open(resolved_path, O_RDWR);
+      return open(resolved_path, flags);
     }
   }
 
@@ -165,7 +168,7 @@ int libhoth_mtd_open(const struct libhoth_mtd_device_init_options* options,
   struct libhoth_device* dev = NULL;
   struct libhoth_mtd_device* mtd_dev = NULL;
 
-  fd = mtd_open(options->path, options->name);
+  fd = mtd_open(options->path, options->name, options->read_only);
   if (fd < 0) {
     status = LIBHOTH_ERR_INTERFACE_NOT_FOUND;
     goto err_out;
