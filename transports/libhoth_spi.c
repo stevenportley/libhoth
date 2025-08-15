@@ -29,8 +29,12 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "libhoth_spi.h"
 #include "transports/libhoth_device.h"
 #include "transports/libhoth_ec.h"
+
+#define DID_VID_ADDR 0xD40F00
+#define RID_ADDR 0xD40F04
 
 struct libhoth_spi_device {
   int fd;
@@ -533,6 +537,35 @@ int libhoth_spi_send_and_receive_response(struct libhoth_device* dev,
   spi_dev->buffered_request_size = 0;
 
   return rc;
+}
+
+int libhoth_tpm_spi_probe(struct libhoth_device* dev) {
+  struct libhoth_spi_device* spi_dev =
+      (struct libhoth_spi_device*)dev->user_ctx;
+
+  const uint32_t addr = DID_VID_ADDR;
+  uint8_t tx_buf[4];
+  uint8_t rx_buf[1] = {0};
+
+  tx_buf[0] = (1 << 7);  // Read single byte
+
+  *(uint32_t*)&tx_buf[1] = addr;
+
+  struct spi_ioc_transfer xfer = {0};
+
+  xfer.tx_buf = (uint64_t)tx_buf;
+  xfer.rx_buf = (uint64_t)rx_buf;
+  xfer.len = sizeof(rx_buf);
+
+  const int status = ioctl(spi_dev->fd, SPI_IOC_MESSAGE(1), xfer);
+  if (status < 0) {
+    printf("Failed to read RID: %x\n", status);
+    return -1;
+  }
+
+  printf("RID: %x\n", rx_buf[0]);
+
+  return LIBHOTH_OK;
 }
 
 int libhoth_spi_close(struct libhoth_device* dev) {
