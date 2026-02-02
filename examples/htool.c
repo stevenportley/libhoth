@@ -1786,7 +1786,7 @@ static const struct htool_param GLOBAL_FLAGS[] = {
              "'1s', '1500ms')."},
     {HTOOL_FLAG_VALUE, .name = "usb_retry_delay", .default_value = "0ms",
      .desc = "(deprecated use `retry_delay`) Delay between USB open retries (e.g., '50ms', '10000us')."},
-    {HTOOL_FLAG_VALUE, .name = "retry_duration", .default_value = "1000ms",
+    {HTOOL_FLAG_VALUE, .name = "retry_duration", .default_value = "10s",
      .desc = "Maximum duration to retry opening a busy device (e.g., "
              "'1s', '1500ms')."},
     {HTOOL_FLAG_VALUE, .name = "retry_delay", .default_value = "50ms",
