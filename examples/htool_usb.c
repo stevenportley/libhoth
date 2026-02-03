@@ -309,9 +309,9 @@ struct libhoth_device* htool_libhoth_usb_device(void) {
   // Get retry parameters from global flags
   const char* duration_str;
   const char* delay_str;
-  if (htool_get_param_string(htool_global_flags(), "usb_retry_duration",
+  if (htool_get_param_string(htool_global_flags(), "retry_duration",
                              &duration_str) ||
-      htool_get_param_string(htool_global_flags(), "usb_retry_delay",
+      htool_get_param_string(htool_global_flags(), "retry_delay",
                              &delay_str)) {
     return NULL;
   }
@@ -320,12 +320,12 @@ struct libhoth_device* htool_libhoth_usb_device(void) {
   int64_t retry_delay_us = parse_time_string_us(delay_str);
 
   if (retry_duration_us < 0) {
-    fprintf(stderr, "Invalid format for --usb_retry_duration: %s\n",
+    fprintf(stderr, "Invalid format for --retry_duration: %s\n",
             duration_str);
     return NULL;
   }
   if (retry_delay_us < 0) {
-    fprintf(stderr, "Invalid format for --usb_retry_delay: %s\n", delay_str);
+    fprintf(stderr, "Invalid format for --retry_delay: %s\n", delay_str);
     return NULL;
   }
   // Convert duration to milliseconds for comparison with monotonic time helper
